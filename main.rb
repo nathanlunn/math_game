@@ -1,24 +1,5 @@
-class Player
-  attr_accessor :name, :lives
-
-  def initialize(name)
-    @name = name
-    @lives = 3
-  end
-
-end
-
-class Round
-  attr_accessor :player, :question, :answer
-
-  def initialize(player)
-    @player = player
-    first_num = (rand() * 20).to_i
-    second_num = (rand() * 20).to_i
-    @question = "what is #{first_num} plus #{second_num}"
-    @answer = first_num + second_num
-  end
-end
+require_relative './player'
+require_relative './round'
 
 class Game
   def initialize(players)
@@ -28,17 +9,31 @@ class Game
     @players.shuffle!
   end
 
+  def game_over?
+    @players[0].lives == 0 || @players[1].lives == 0
+  end
+
+  def end_game
+    puts "----- GAME OVER -----"
+    if (@player1.lives > @player2.lives)
+      puts "#{@player1.name} wins with a score of #{@player1.lives}/3"
+    else
+      puts "#{@player2.name} wins with a score of #{@player2.lives}/3"
+    end
+    puts "Good Bye!"
+  end
+
   def play
-    while (@players[0].lives != 0 && @players[1].lives !=0)
+    until (game_over?)
       round = Round.new(@players[0])
       
       puts "----- NEW TURN -----"
       print "#{round.player.name}: #{round.question}? "
       player_answer = (gets.chomp).to_i
       if player_answer == round.answer
-        puts "#{round.player}: YES! Your are correct!"
+        puts "#{round.player.name}: YES! Your are correct!"
       else
-        puts "#{round.player}: I'm afraid that's the wrong answer."
+        puts "#{round.player.name}: I'm afraid that's the wrong answer."
         round.player.lives -= 1
       end
       puts "P1: #{@player1.lives}/3 vs P2: #{@player2.lives}/3"
@@ -46,13 +41,7 @@ class Game
       @players.rotate!
     end
 
-    if (@player1.lives > @player2.lives)
-      puts "#{@player1.name} wins with a score of #{@player1.lives}/3"
-    else
-      puts "#{@player2.name} wins with a score of #{@player2.lives}/3"
-    end
-    puts "----- GAME OVER -----"
-    puts "Good Bye!"
+    end_game
   end
 end
 
